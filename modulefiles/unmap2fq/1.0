@@ -1,0 +1,23 @@
+#%Module1.0#
+###
+### modules modulefile
+###
+
+proc ModulesHelp { } {
+        global version compiler
+        puts stderr "\tTake any bam file and abstract unmapped reads into fastq format\n"
+}
+
+puts stderr "To creat job file: run_unmap.py --bam NA12878.bam --out NA12878_test --tmp unmap_test -j na12878.sjm"
+puts stderr "To run job file  : sjm na12878.sjm"
+
+set pipeline_dir /home/swang/app/unmap2fq
+prepend-path PATH $pipeline_dir/bin
+
+prepend-path PATH /hpcf/apps/sjm/install/1.2.0/bin
+prepend-path PATH /hpcf/apps/python/install/2.7.2/bin
+prepend-path LD_LIBRARY_PATH /hpcf/apps/python/install/2.7.2/lib
+setenv PICARDPATH /hpcf/apps/picard/install/1.129
+prepend-path PATH /hpcf/apps/samtools/vendor/1.2
+prepend-path PATH /hpcf/apps/htslib/install/1.2.1/bin
+
