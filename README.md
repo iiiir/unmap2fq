@@ -3,9 +3,9 @@ Short pipeline that abstract unmapped reads from a bam file and convert to fastq
 
 
 ### dependencies    
-python 2.7
-SJM (simple job manager)
-samtools
-picard
-bedtools
-LSF batch system (or other)
+python 2.7    
+SJM (simple job manager)    
+samtools    
+picard     
+bedtools    
+LSF batch system (or other)    
