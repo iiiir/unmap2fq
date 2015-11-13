@@ -72,9 +72,9 @@ def bam2fastq(pjob):
     job.memory = "20G"
     job.output = args.output
     if args.recalibrated:
-		job.append('bam2fq.sh -r True -o %s %s'%(job.output, unmapped_bamfile.path))
-	else:
-	    job.append('bam2fq.sh -o %s %s'%(job.output, unmapped_bamfile.path))
+        job.append('bam2fq.sh -r -o %s %s'%(job.output, unmapped_bamfile.path))
+    else:
+        job.append('bam2fq.sh -o %s %s'%(job.output, unmapped_bamfile.path))
     job.depend(pjob)
     return job
 
