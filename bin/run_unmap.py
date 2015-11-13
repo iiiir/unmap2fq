@@ -13,6 +13,7 @@ p = argparse.ArgumentParser(description='Generating the job file for the getting
 p.add_argument('-b','--bam', metavar='STR', required=True, help='Support for aligned and dedupped BAMs as input')
 p.add_argument('-j', '--jobfile', metavar='FILE', help='The jobfile name (default: stdout)')
 p.add_argument('-o', '--output', metavar='DIR', required=True, help='PREFIX of the output file')
+p.add_argument('-r','--recalibrated',action='store_true', help='If the BAMs are recalibrated with GATK')
 p.add_argument('-A','--account', metavar='STR', help='Support for aligned and dedupped BAMs as input')
 p.add_argument('-T', '--tmp', metavar='DIR', required=True, help='The TMP directory for storing intermediate files (default=output directory')
 p.add_argument('--submit', action='store_true', help='Submit the jobs')
@@ -42,10 +43,12 @@ def get_unmap(bamfile):
     job1 = sjm.Job('get_unmap_f48-%s'%bamfile.prefix)
     job1.memory = "5G"
     job1.output = os.path.join(tmpdir, '%s.%s' % (bamfile.prefix, 'f48.bam'))
+    # Get unmapped reads (if mate mapped), 1 read in a pair
     job1.append('samtools view -h -F 4 -f 8 %s -bo %s'%(bamfile.path,job1.output))
     jobs.append(job1)
     job2 = sjm.Job('get_unmap_f84-%s'%bamfile.prefix)
     job2.output = os.path.join(tmpdir, '%s.%s' % (bamfile.prefix, 'f84.bam'))
+    # Get mapped reads (if mate is unmapped), 1 read ina pair
     job2.append('samtools view -h -F 8 -f 4 %s -bo %s'%(bamfile.path,job2.output))
     jobs.append(job2)
     job3 = sjm.Job('get_unmap_f12-%s'%bamfile.prefix)
@@ -66,9 +69,12 @@ def merge_bams(pjobs):
 def bam2fastq(pjob):
     unmapped_bamfile = util.File(pjob.output)
     job = sjm.Job('bam2fq-%s'%(bamfile.prefix))
-    job.memory = "10G"
+    job.memory = "20G"
     job.output = args.output
-    job.append('bam2fq.sh -o %s %s'%(job.output, unmapped_bamfile.path))
+    if args.recalibrated:
+		job.append('bam2fq.sh -r True -o %s %s'%(job.output, unmapped_bamfile.path))
+	else:
+	    job.append('bam2fq.sh -o %s %s'%(job.output, unmapped_bamfile.path))
     job.depend(pjob)
     return job
 
